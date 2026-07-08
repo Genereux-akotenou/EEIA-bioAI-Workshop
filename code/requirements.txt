@@ -1,0 +1,9 @@
+numpy
+pandas
+scikit-learn
+torch
+matplotlib
+umap-learn
+requests
+tqdm
+jupyter

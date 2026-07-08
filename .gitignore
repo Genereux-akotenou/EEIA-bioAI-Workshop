@@ -1,0 +1,14 @@
+# Data is large (multi-GB genomes + activation dumps) and lives outside git history.
+data/autoencoder/
+temp_chunk_of_code_will_be_deleted/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+venv/
+.venv/
+
+# Secrets
+.env
+*api_key*

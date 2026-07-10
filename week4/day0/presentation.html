@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA pour la Biologie — Lancement de l'École d'Été</title>
+<style>
+  :root{
+    --bg-0:#070b14;
+    --bg-1:#0d1526;
+    --panel:#111a2e;
+    --border:rgba(255,255,255,0.09);
+    --text:#eef2fb;
+    --muted:#93a1c2;
+    --accent:#5eead4;
+    --accent-2:#818cf8;
+    --accent-3:#f472b6;
+    --amber:#fbbf24;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:radial-gradient(circle at 15% 10%, #142038 0%, var(--bg-0) 55%) fixed;
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;
+    overflow:hidden;
+  }
+  #deck{
+    position:relative;
+    width:100vw;height:100vh;
+  }
+  .slide{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    justify-content:center;align-items:center;
+    padding:6vh 8vw;
+    opacity:0;visibility:hidden;
+    transform:translateY(24px);
+    transition:opacity .45s ease, transform .45s ease, visibility 0s linear .45s;
+  }
+  .slide.active{
+    opacity:1;visibility:visible;
+    transform:translateY(0);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .eyebrow{
+    letter-spacing:.22em;text-transform:uppercase;
+    font-size:.78rem;font-weight:600;color:var(--accent);
+    margin-bottom:1.1rem;
+  }
+  h1{
+    font-size:clamp(2.2rem, 5vw, 4rem);
+    line-height:1.08;margin:0 0 1rem 0;font-weight:800;
+    background:linear-gradient(90deg,#fff 20%, var(--accent) 60%, var(--accent-2) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-align:center;
+  }
+  h2{
+    font-size:clamp(1.5rem, 3vw, 2.3rem);
+    font-weight:700;margin:0 0 1.6rem 0;text-align:center;color:var(--text);
+  }
+  p.lead{
+    font-size:clamp(1.05rem, 1.6vw, 1.35rem);
+    color:var(--muted);max-width:780px;text-align:center;line-height:1.6;
+    margin:0 auto 1.4rem auto;
+  }
+  .badge-row{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:1.6rem;}
+  .badge{
+    border:1px solid var(--border);background:var(--panel);
+    padding:.45rem 1rem;border-radius:999px;font-size:.85rem;color:var(--muted);
+  }
+  .grid{
+    display:grid;gap:1.1rem;width:100%;max-width:1100px;
+  }
+  .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  @media (max-width:900px){
+    .grid.cols-4{grid-template-columns:repeat(2,1fr);}
+    .grid.cols-3{grid-template-columns:repeat(1,1fr);}
+  }
+  .card{
+    background:linear-gradient(180deg, var(--panel), #0b1220);
+    border:1px solid var(--border);border-radius:16px;
+    padding:1.4rem 1.3rem;position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  }
+  .card h3{margin:.2rem 0 .5rem 0;font-size:1.05rem;color:var(--text);}
+  .card p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.5;}
+  .card .num{
+    font-size:.75rem;font-weight:700;color:var(--accent);
+    letter-spacing:.1em;
+  }
+  .pipeline{
+    display:flex;align-items:center;justify-content:center;gap:.6rem;
+    flex-wrap:wrap;width:100%;max-width:1150px;margin-top:1rem;
+  }
+  .stage{
+    flex:1 1 200px;min-width:180px;max-width:230px;
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:1.1rem;text-align:center;
+  }
+  .stage .icon{font-size:1.8rem;margin-bottom:.4rem;}
+  .stage h4{margin:.2rem 0;font-size:.95rem;}
+  .stage p{margin:0;font-size:.78rem;color:var(--muted);line-height:1.4;}
+  .arrow{color:var(--accent-2);font-size:1.4rem;flex:0 0 auto;}
+  @media (max-width:900px){ .arrow{transform:rotate(90deg);} }
+  .day-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;
+    width:100%;max-width:1150px;
+  }
+  @media (max-width:900px){ .day-grid{grid-template-columns:repeat(2,1fr);} }
+  .day-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:1.1rem 1.2rem;
+  }
+  .day-card .tag{
+    display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.08em;
+    color:var(--bg-0);background:var(--accent);padding:.15rem .55rem;border-radius:999px;
+    margin-bottom:.55rem;
+  }
+  .day-card h4{margin:.1rem 0 .35rem 0;font-size:1rem;}
+  .day-card p{margin:0;font-size:.82rem;color:var(--muted);line-height:1.45;}
+  .cta{
+    margin-top:2.2rem;display:inline-flex;align-items:center;gap:.6rem;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#04101a;font-weight:700;text-decoration:none;
+    padding:.9rem 1.8rem;border-radius:999px;font-size:1.05rem;
+    box-shadow:0 10px 30px -8px rgba(94,234,212,.45);
+    transition:transform .2s ease;
+  }
+  .cta:hover{transform:translateY(-2px);}
+  .footer-note{margin-top:1.4rem;font-size:.8rem;color:var(--muted);text-align:center;}
+
+  /* nav controls */
+  #progress{
+    position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .35s ease;z-index:20;
+  }
+  #dots{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    display:flex;gap:.5rem;z-index:20;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);
+    cursor:pointer;transition:background .2s, transform .2s;
+  }
+  .dot.active{background:var(--accent);transform:scale(1.35);}
+  .nav-btn{
+    position:fixed;top:50%;transform:translateY(-50%);
+    background:rgba(255,255,255,.04);border:1px solid var(--border);
+    color:var(--text);width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:1.2rem;z-index:20;user-select:none;
+    transition:background .2s;
+  }
+  .nav-btn:hover{background:rgba(255,255,255,.1);}
+  #prev{left:18px;} #next{right:18px;}
+  #slide-count{
+    position:fixed;top:18px;right:22px;font-size:.78rem;color:var(--muted);z-index:20;
+    letter-spacing:.05em;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="slide-count"></div>
+<div id="deck">
+
+  <!-- Slide 0: Titre -->
+  <section class="slide active">
+    <div class="eyebrow">EEIA · École d'Été IA</div>
+    <h1>Apprendre à un modèle à lire l'ADN</h1>
+    <p class="lead">
+      Un parcours d'une semaine, depuis des génomes bactériens bruts jusqu'à un modèle de
+      fondation génomique — classifier l'<strong>ADN codant vs. non-codant</strong>, étape
+      par étape.
+    </p>
+    <div class="badge-row">
+      <span class="badge">🧬 Bioinformatique</span>
+      <span class="badge">🤖 Modèles de fondation (Evo2)</span>
+      <span class="badge">📦 Distillation de connaissances</span>
+      <span class="badge">⚡ Analyse d'efficacité</span>
+    </div>
+  </section>
+
+  <!-- Slide 1: Le problème -->
+  <section class="slide">
+    <div class="eyebrow">Le problème</div>
+    <h2>Chaque génome est une longue chaîne. Seule une partie a un sens.</h2>
+    <div class="grid cols-3">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Le dogme central</h3>
+        <p>ADN → ARN → protéine. Les gènes sont lus par triplets (codons), chacun spécifiant un acide aminé.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Codant vs. non-codant</h3>
+        <p>Une <strong>CDS</strong> (séquence codante) code réellement pour une protéine. Le reste — régions intergéniques, séquences régulatrices — est non-codant.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>Une vraie recherche de gènes</h3>
+        <p>Étant donné une courte fenêtre d'ADN, prédire : codant ou non ? C'est une tâche bioinformatique authentique, pas un problème jouet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: Pipeline -->
+  <section class="slide">
+    <div class="eyebrow">Le parcours</div>
+    <h2>Quatre étapes, une seule histoire : des comptages simples au modèle de fondation</h2>
+    <div class="pipeline">
+      <div class="stage"><div class="icon">🔢</div><h4>k-mer + CNN</h4><p>Modèles de référence simples : comptages de sous-chaînes et CNN one-hot</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="icon">🧠</div><h4>Embeddings Evo2</h4><p>Les caractéristiques gelées d'un modèle de fondation génomique + un petit classifieur</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="icon">🎓</div><h4>Distillation</h4><p>Compresser le teacher dans un student minuscule et rapide</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="icon">⚖️</div><h4>Efficacité</h4><p>Précision vs. latence vs. taille — que déploieriez-vous réellement ?</p></div>
+    </div>
+    <p class="footer-note">Piste bonus optionnelle : autoencodeurs parcimonieux pour l'interprétabilité — les caractéristiques encodent-elles la périodicité des codons ?</p>
+  </section>
+
+  <!-- Slide 3: Feuille de route -->
+  <section class="slide">
+    <div class="eyebrow">La feuille de route</div>
+    <h2>Cinq jours, un seul pipeline, construit ensemble</h2>
+    <div class="day-grid">
+      <div class="day-card"><span class="tag">JOUR 1</span><h4>Biologie + modèles de référence</h4><p>Dogme central, FASTA/GFF bruts, k-mer + régression logistique, one-hot + CNN.</p></div>
+      <div class="day-card"><span class="tag">JOUR 2</span><h4>Embeddings Evo2</h4><p>Embeddings gelés du modèle de fondation + tête MLP. Visualisation PCA/UMAP.</p></div>
+      <div class="day-card"><span class="tag">JOUR 3</span><h4>Distillation</h4><p>Cibles douces, température, « dark knowledge » — compresser le teacher en student.</p></div>
+      <div class="day-card"><span class="tag">JOUR 4</span><h4>Analyse d'efficacité</h4><p>Un seul graphique, tous les modèles : précision vs. latence vs. nombre de paramètres.</p></div>
+      <div class="day-card"><span class="tag">JOUR 5</span><h4>Bonus + présentations</h4><p>Piste d'interprétabilité par autoencodeur parcimonieux, puis présentations de groupe.</p></div>
+      <div class="day-card"><span class="tag">OBJECTIF</span><h4>Déployer un modèle</h4><p>Repartez avec un avis : quel modèle déploieriez-vous réellement, et pourquoi ?</p></div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Ce que vous repartirez avec -->
+  <section class="slide">
+    <div class="eyebrow">Pourquoi c'est important</div>
+    <h2>Vous repartirez cette semaine capables de répondre à de vraies questions</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>🔬 Qu'est-ce qu'un modèle de fondation, vraiment ?</h3>
+        <p>Pas de la magie — un modèle entraîné une fois sur d'énormes données non étiquetées, dont les représentations internes gelées se transfèrent à de nouvelles tâches avec un petit classifieur au-dessus.</p>
+      </div>
+      <div class="card">
+        <h3>🧪 Pourquoi distiller plutôt que d'utiliser directement le grand modèle ?</h3>
+        <p>Parce qu'en production, la latence et le coût comptent. Un student distillé peut récupérer la majeure partie de la précision pour une fraction de la taille.</p>
+      </div>
+      <div class="card">
+        <h3>📊 Comment comparer des modèles honnêtement ?</h3>
+        <p>Pas seulement sur la précision — précision, latence et nombre de paramètres ensemble, sur le même graphique, pour chaque modèle que vous construisez.</p>
+      </div>
+      <div class="card">
+        <h3>🧭 Que déploieriez-vous réellement ?</h3>
+        <p>Chaque compromis est une décision. D'ici vendredi, vous saurez en défendre une, avec des chiffres.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: C'est parti -->
+  <section class="slide">
+    <div class="eyebrow">C'est parti</div>
+    <h1 style="font-size:clamp(1.8rem,4vw,3rem);">Le Jour 1 commence maintenant.</h1>
+    <p class="lead">Ouvrez les fichiers de génomes bruts, découvrez les données, et entraînez votre premier modèle de référence — tout ça avant midi.</p>
+    <a class="cta" href="../day1/00_biology_intro_and_data_setup.ipynb">Ouvrir le notebook du Jour 1 →</a>
+    <p class="footer-note">Voir <code>guide.md</code> dans ce dossier pour le chemin complet de la semaine et les notebooks.</p>
+  </section>
+
+</div>
+
+<div id="prev" class="nav-btn">‹</div>
+<div id="next" class="nav-btn">›</div>
+<div id="dots"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsWrap = document.getElementById('dots');
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('slide-count');
+  let idx = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(d);
+  });
+  const dots = document.querySelectorAll('.dot');
+
+  function go(n){
+    idx = (n + slides.length) % slides.length;
+    slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+    counter.textContent = (idx + 1) + ' / ' + slides.length;
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(idx - 1));
+  document.getElementById('next').addEventListener('click', () => go(idx + 1));
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight','PageDown',' '].includes(e.key)) go(idx + 1);
+    if (['ArrowLeft','PageUp'].includes(e.key)) go(idx - 1);
+  });
+
+  go(0);
+</script>
+</body>
+</html>
